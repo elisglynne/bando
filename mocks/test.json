@@ -1,0 +1,8 @@
+{
+    "200": {
+        "Response": "Ok"
+    },
+    "400": {
+        "Response": "Bad Request"
+    }
+}

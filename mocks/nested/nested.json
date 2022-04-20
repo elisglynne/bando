@@ -1,0 +1,8 @@
+{
+    "200": {
+        "Response": "This is a nested response"
+    },
+    "400": {
+        "Response": "Bad Request"
+    }
+}

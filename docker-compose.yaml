@@ -1,0 +1,9 @@
+version: '2'
+services:
+  myservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'mock_server'
+    ports:
+      - 5400:8000

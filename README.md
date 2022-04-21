@@ -2,7 +2,7 @@
 A super simple mock server written in deno 
 
 ## what is it?
-bando is a simple deno server that returns a JSON response based on the route provided. Mocks are placed as json files, like `example.json` in the `mocks` directory, and then can be accessed by making requests to the `http://localhost:5400/example` URL. The JSON files should be structured like:
+bando is a simple deno server that returns a JSON response based on the route provided. Mocks are placed as json files, like `example.json` in the `mocks` directory, and then can be accessed by making requests to the `http://localhost:5400/mock/test` URL. The JSON files should be structured like:
 
 ```
   200: {

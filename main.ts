@@ -1,7 +1,7 @@
 /**
  * Main entry point to Bando.
  */
-import { Application, Router, sleep, RouterContext } from "./deps.ts";
+import { Application, Router, sleep } from "./deps.ts";
 
 // Sets up Oak application router.
 const router = new Router();
@@ -20,8 +20,9 @@ router.get("/", ({response}) => {
  * mock-er wants to mock the request to /foo/bar, it should be in the mocks
  * directory as foo/bar.json.
  */
-router.all("/mock/:mock*", async ({response, request, params}:RouterContext) => {
-    const mockPath = params.mock;
+router.all("/mock/:mockPath*?", async (context) => {
+    const {params, request, response} = context;
+    const mockPath = params.mockPath;
     const preferredStatus = request.headers.get("preferred-response-status") || "200";
     const mockFile = Deno.readTextFileSync(`./mocks/${mockPath}.json`);
     const responseBody = JSON.parse(mockFile)[preferredStatus];
@@ -44,18 +45,20 @@ router.all("/mock/:mock*", async ({response, request, params}:RouterContext) => 
 const app = new Application(); 
 
 // Sets up the application logger and logs it out to the running terminal.
-app.use(async (ctx: RouterContext, next: ) => {
+app.use(async (context, next) => {
+    const {response, request} = context;
     await next();
-    const rt = ctx.response.headers.get("X-Response-Time");
-    console.log(`${ctx.response.status} – ${ctx.request.method} ${ctx.request.url} – ${rt}`);
+    const rt = response.headers.get("X-Response-Time");
+    console.log(`${response.status} – ${request.method} ${request.url} – ${rt}`);
   });
 
 // Adds a simple timer to the response header.
-app.use(async (ctx: RouterContext, next) => {
+app.use(async (context, next) => {
+    const { response } = context;
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
-    ctx.response.headers.set("X-Response-Time", `${ms}ms`);
+    response.headers.set("X-Response-Time", `${ms}ms`);
   });
 
 // Router

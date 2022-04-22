@@ -1,0 +1,73 @@
+{
+    "responseHeader": {
+      "requestType": "Bankwizard",
+      "clientReferenceId": "test-BWA_PD7andAD8andBANK1_ACCEPT",
+      "expRequestId": "RB000000003852",
+      "messageTime": "2022-04-19T15:57:19Z",
+      "overallResponse": {
+        "decision": "REFER",
+        "decisionText": "Continue and Investigate",
+        "decisionReasons": [
+          "highly probable match on person, zero address score"
+        ],
+        "recommendedNextActions": [],
+        "spareObjects": []
+      },
+      "responseCode": "R0201",
+      "responseType": "INFO",
+      "responseMessage": "Workflow Complete.",
+      "tenantID": "bad135c296154aa58eba4993f6fbcf"
+    },
+    "clientResponsePayload": {
+      "orchestrationDecisions": [
+        {
+          "sequenceId": "1",
+          "decisionSource": "BankWizard",
+          "decision": "REFER",
+          "decisionReasons": [
+            "highly probable match on person, zero address score"
+          ],
+          "score": 0,
+          "decisionText": "Continue and Investigate",
+          "nextAction": "Continue",
+          "decisionTime": "2022-04-19T15:57:26Z"
+        }
+      ],
+      "decisionElements": [
+        {
+          "serviceName": "Bankwizard",
+          "applicantId": "APPLICANT_1",
+          "decision": "Match",
+          "matches": [],
+          "scores": [
+            {
+              "name": "Personal details",
+              "score": 7,
+              "type": "SCORE"
+            }
+          ],
+          "records": [
+            {
+              "externalLookups": [
+                {
+                  "source": "BankWizardService",
+                  "externalData": [
+                    {
+                      "fieldName": "accountVerificationStatus",
+                      "fieldValue": "Match"
+                    },
+                    {
+                      "fieldName": "personalDetailsScore",
+                      "fieldValue": "7"
+                    }
+                  ],
+                  "contactId": "MainContact_1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "originalRequestData": {}
+  }

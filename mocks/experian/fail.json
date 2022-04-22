@@ -1,0 +1,73 @@
+{
+    "responseHeader": {
+      "requestType": "Bankwizard",
+      "clientReferenceId": "test-BWA_PD7andAD8andBANK1_ACCEPT",
+      "expRequestId": "RB000000004331",
+      "messageTime": "2022-04-19T16:56:27Z",
+      "overallResponse": {
+        "decision": "STOP",
+        "decisionText": "Stop and Investigate",
+        "decisionReasons": [
+          "no match to person"
+        ],
+        "recommendedNextActions": [],
+        "spareObjects": []
+      },
+      "responseCode": "R0201",
+      "responseType": "INFO",
+      "responseMessage": "Workflow Complete.",
+      "tenantID": "bad135c296154aa58eba4993f6fbcf"
+    },
+    "clientResponsePayload": {
+      "orchestrationDecisions": [
+        {
+          "sequenceId": "1",
+          "decisionSource": "BankWizard",
+          "decision": "STOP",
+          "decisionReasons": [
+            "no match to person"
+          ],
+          "score": 0,
+          "decisionText": "Stop and Investigate",
+          "nextAction": "Continue",
+          "decisionTime": "2022-04-19T16:56:29Z"
+        }
+      ],
+      "decisionElements": [
+        {
+          "serviceName": "Bankwizard",
+          "applicantId": "APPLICANT_1",
+          "decision": "Match",
+          "matches": [],
+          "scores": [
+            {
+              "name": "Personal details",
+              "score": 1,
+              "type": "SCORE"
+            }
+          ],
+          "records": [
+            {
+              "externalLookups": [
+                {
+                  "source": "BankWizardService",
+                  "externalData": [
+                    {
+                      "fieldName": "accountVerificationStatus",
+                      "fieldValue": "Match"
+                    },
+                    {
+                      "fieldName": "personalDetailsScore",
+                      "fieldValue": "1"
+                    }
+                  ],
+                  "contactId": "MainContact_1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "originalRequestData": {}
+  }

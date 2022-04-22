@@ -1,7 +1,7 @@
 /**
  * Main entry point to Bando.
  */
-import { Application, Router } from "./deps.ts";
+import { Application, Router, sleep, RouterContext } from "./deps.ts";
 
 // Sets up Oak application router.
 const router = new Router();
@@ -20,14 +20,20 @@ router.get("/", ({response}) => {
  * mock-er wants to mock the request to /foo/bar, it should be in the mocks
  * directory as foo/bar.json.
  */
-router.all("/mock/:mock*", ({response, request, params}) => {
+router.all("/mock/:mock*", async ({response, request, params}:RouterContext) => {
     const mockPath = params.mock;
-    const preferredStatus = request.headers.get("preferred-response-type") || "200";
+    const preferredStatus = request.headers.get("preferred-response-status") || "200";
     const mockFile = Deno.readTextFileSync(`./mocks/${mockPath}.json`);
     const responseBody = JSON.parse(mockFile)[preferredStatus];
-    response.status = parseInt(preferredStatus);
+    const preferredDelay = request.headers.get("preferred-response-delay") || "0";
 
+    /**
+     * We allow a simulated sleep delay to be set in the request header.
+     */
+    await sleep(parseInt(preferredDelay));
+    
     if (responseBody) {
+        response.status = parseInt(preferredStatus);
         response.body = JSON.parse(mockFile)[preferredStatus];
     } else {
         response.status = 501;
@@ -38,14 +44,14 @@ router.all("/mock/:mock*", ({response, request, params}) => {
 const app = new Application(); 
 
 // Sets up the application logger and logs it out to the running terminal.
-app.use(async (ctx, next) => {
+app.use(async (ctx: RouterContext, next: ) => {
     await next();
     const rt = ctx.response.headers.get("X-Response-Time");
     console.log(`${ctx.response.status} – ${ctx.request.method} ${ctx.request.url} – ${rt}`);
   });
 
 // Adds a simple timer to the response header.
-app.use(async (ctx, next) => {
+app.use(async (ctx: RouterContext, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;

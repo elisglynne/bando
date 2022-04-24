@@ -2,4 +2,4 @@ import { Application, Router, RouterContext } from "https://deno.land/x/oak/mod.
 import { sleep } from "https://deno.land/x/sleep/mod.ts";
 
 
-export { Application, Router, sleep, RouterContext };
+export { Application, Router, sleep, type RouterContext };

@@ -20,7 +20,7 @@ router.get("/", ({response}) => {
  * mock-er wants to mock the request to /foo/bar, it should be in the mocks
  * directory as foo/bar.json.
  */
-router.all("/mock/:mockPath*?", async (context) => {
+router.all("/mock/:mockPath*", async (context) => {
     const {params, request, response} = context;
     const mockPath = params.mockPath;
     const preferredStatus = request.headers.get("preferred-response-status") || "200";

@@ -1,7 +1,11 @@
 /**
  * Main entry point to Bando.
  */
-import { Application, Router, sleep } from "./deps.ts";
+import { Application, Router, sleep, Request, helpers } from "./deps.ts";
+
+// Const for preferred status code header/query param
+const PREFERRED_STATUS = 'preferred-response-status';
+const PREFERRED_DELAY = 'preferred-response-delay';
 
 // Sets up Oak application router.
 const router = new Router();
@@ -15,6 +19,17 @@ router.get("/", ({response}) => {
 });
 
 /**
+ * Extract the preferred status and preferred delay from the request & params.
+ * The details in the header will always override anything in the query params.
+ */
+const extractPreferredResponse = (query: ReturnType<typeof helpers.getQuery>, request: Request) => {
+    const preferredStatus = request.headers.get(PREFERRED_STATUS) || query[PREFERRED_STATUS] || "200";
+    const preferredDelay = request.headers.get(PREFERRED_DELAY) || query[PREFERRED_DELAY] || "0";
+
+    return {preferredStatus, preferredDelay};
+}
+
+/**
  * Returns the mocked response found in the mocks directory. Can be nested or can
  * be a single file with the same name as the request path. For example, if the
  * mock-er wants to mock the request to /foo/bar, it should be in the mocks
@@ -23,11 +38,11 @@ router.get("/", ({response}) => {
 router.all("/mock/:mockPath*", async (context) => {
     const {params, request, response} = context;
     const mockPath = params.mockPath;
-    const preferredStatus = request.headers.get("preferred-response-status") || "200";
     const mockFile = Deno.readTextFileSync(`./mocks/${mockPath}.json`);
+    const query = helpers.getQuery(context, { mergeParams: true });
+    const {preferredStatus, preferredDelay} = extractPreferredResponse(query, request);
     const responseBody = JSON.parse(mockFile)[preferredStatus];
-    const preferredDelay = request.headers.get("preferred-response-delay") || "0";
-
+    
     /**
      * We allow a simulated sleep delay to be set in the request header.
      */

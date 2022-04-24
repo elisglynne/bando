@@ -1,5 +1,5 @@
 /**
- * Main entry point to Bando.
+ * Main entry point to bando.
  */
 import { Application, Router, sleep, Request, helpers } from "./deps.ts";
 

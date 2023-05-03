@@ -30,7 +30,7 @@ this will always return the same name (boris mcBoringName). but if you want some
 
 ```
   200: {
-    example: _firstName_
+    example: "_firstName_"
   },
   400: {
     example: fail

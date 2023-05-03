@@ -1,0 +1,5 @@
+{
+  "deno.enable": true,
+  "deno.inlayHints.enumMemberValues.enabled": true,
+  "deno.inlayHints.functionLikeReturnTypes.enabled": true
+}

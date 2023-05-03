@@ -1,11 +1,19 @@
 /**
  * Main entry point to bando.
  */
-import { Application, Router, sleep, Request, helpers } from "./deps.ts";
+import {
+  Application,
+  Router,
+  sleep,
+  Request,
+  Response,
+  helpers,
+} from "./deps.ts";
+import { fakerMap } from "./fakerMap.ts";
 
 // Const for preferred status code header/query param
-const PREFERRED_STATUS = 'preferred-response-status';
-const PREFERRED_DELAY = 'preferred-response-delay';
+const PREFERRED_STATUS = "preferred-response-status";
+const PREFERRED_DELAY = "preferred-response-delay";
 
 // Sets up Oak application router.
 const router = new Router();
@@ -13,21 +21,28 @@ const router = new Router();
 /**
  * Generic handler for root path of the application.
  */
-router.get("/", ({response}) => {
+router.get("/", ({ response }: { response: Response }) => {
   response.headers.set("Content-Type", "application/json");
-  response.body = {  message: "Hello World again!" };
+  response.body = {
+    message: "Oh hello. This isn't the mock path you're expecting.",
+  };
 });
 
 /**
  * Extract the preferred status and preferred delay from the request & params.
  * The details in the header will always override anything in the query params.
  */
-const extractPreferredResponse = (query: ReturnType<typeof helpers.getQuery>, request: Request) => {
-    const preferredStatus = request.headers.get(PREFERRED_STATUS) || query[PREFERRED_STATUS] || "200";
-    const preferredDelay = request.headers.get(PREFERRED_DELAY) || query[PREFERRED_DELAY] || "0";
+const extractPreferredResponse = (
+  query: ReturnType<typeof helpers.getQuery>,
+  request: Request
+) => {
+  const preferredStatus =
+    request.headers.get(PREFERRED_STATUS) || query[PREFERRED_STATUS] || "200";
+  const preferredDelay =
+    request.headers.get(PREFERRED_DELAY) || query[PREFERRED_DELAY] || "0";
 
-    return {preferredStatus, preferredDelay};
-}
+  return { preferredStatus, preferredDelay };
+};
 
 /**
  * Returns the mocked response found in the mocks directory. Can be nested or can
@@ -36,25 +51,48 @@ const extractPreferredResponse = (query: ReturnType<typeof helpers.getQuery>, re
  * directory as foo/bar.json.
  */
 router.all("/mock/:mockPath*", async (context) => {
-    const {params, request, response} = context;
-    const mockPath = params.mockPath;
-    const mockFile = Deno.readTextFileSync(`./mocks/${mockPath}.json`);
-    const query = helpers.getQuery(context, { mergeParams: true });
-    const {preferredStatus, preferredDelay} = extractPreferredResponse(query, request);
-    const responseBody = JSON.parse(mockFile)[preferredStatus];
-    
-    /**
-     * We allow a simulated sleep delay to be set in the request header.
-     */
-    await sleep(parseInt(preferredDelay));
-    
-    if (responseBody) {
-        response.status = parseInt(preferredStatus);
-        response.body = JSON.parse(mockFile)[preferredStatus];
-    } else {
-        response.status = 501;
-        response.body = { error: `Mock not found with status ${preferredStatus}` };
-    }
+  const { params, request, response } = context;
+  const mockPath = params.mockPath;
+  const mockFile = Deno.readTextFileSync(`./mocks/${mockPath}.json`);
+  const query = helpers.getQuery(context, { mergeParams: true });
+  const { preferredStatus, preferredDelay } = extractPreferredResponse(
+    query,
+    request
+  );
+  const responseBody = JSON.parse(mockFile)[preferredStatus];
+
+  /**
+   * We allow a simulated sleep delay to be set in the request header.
+   */
+  await sleep(parseInt(preferredDelay));
+
+  if (responseBody) {
+    const modifiedResponseBody = responseBody;
+    const iterate = (res: Record<string, unknown>) => {
+      Object.keys(res).forEach((key) => {
+        if (
+          typeof res[key] === "string" &&
+          (res[key] as string).startsWith("_") &&
+          (res[key] as string).endsWith("_")
+        ) {
+          res[key] = fakerMap(res[key] as string);
+        } else {
+          modifiedResponseBody[key] = res[key];
+        }
+
+        if (typeof res[key] === "object" && res[key] !== null) {
+          // @ts-ignore
+          iterate(res[key]);
+        }
+      });
+    };
+    iterate(modifiedResponseBody);
+    response.status = parseInt(preferredStatus);
+    response.body = modifiedResponseBody;
+  } else {
+    response.status = 501;
+    response.body = { error: `Mock not found with status ${preferredStatus}` };
+  }
 });
 
 const app = new Application(); 

@@ -1,0 +1,11 @@
+{
+  "200": {
+    "Response": {
+      "name": "_fullName_",
+      "age": "_number_"
+    }
+  },
+  "400": {
+    "Response": "_catchPhrase_"
+  }
+}
